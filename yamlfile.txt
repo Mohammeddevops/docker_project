@@ -1,0 +1,34 @@
+---
+- name: Configure Another Node
+  hosts: instance_b  # Replace with the name or IP of Instance B in your inventory
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Create Unix group 'demo'
+      group:
+        name: demo
+        state: present
+
+    - name: Create Unix user 'demo'
+      user:
+        name: demo
+        group: demo
+        shell: /bin/bash
+        createhome: yes
+
+    - name: Deploy Spring Boot App
+      copy:
+        src: /path/to/your/app.war  # Replace with the path to your .war file
+        dest: /home/demo/app.war
+      notify: Restart Spring Boot App
+
+  handlers:
+    - name: Restart Spring Boot App
+      service:
+        name: your-spring-boot-app  # Replace with the actual service name if needed
+        state: restarted
